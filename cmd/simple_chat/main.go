@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
+
+	repo "github.com/vladimir-kopaliani/simple_chat/internal/repository"
 )
 
 var (
@@ -30,6 +32,19 @@ func main() {
 	}()
 
 	// TODO: connect to repository, etc ....
+
+	// repository
+	messagesRepo, err := repo.New(ctx, repo.Configuration{
+		Address:  os.Getenv("POSTGRES_ADDRESS"),
+		DBName:   os.Getenv("POSTGRES_DB"),
+		Password: os.Getenv("POSTGRES_PASSWORD"),
+		User:     os.Getenv("POSTGRES_USER"),
+	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer messagesRepo.Close()
 
 	<-ctx.Done() // lock finishing `main` function until got interrupt signal
 }
